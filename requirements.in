@@ -1,0 +1,12 @@
+Django
+djangorestframework
+djangorestframework-simplejwt
+psycopg2-binary       # Для PostgreSQL
+python-dotenv         # Для переменных окружения
+django-cors-headers   # Для CORS
+celery                # Для отложенных задач
+redis                 # Брокер для Celery
+eventlet              # Для работы Celery на Windows
+requests              # Для запросов к Telegram API
+flake8                # Для проверки кода
+coverage              # Для проверки покрытия тестами
