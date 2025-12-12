@@ -10,3 +10,5 @@ eventlet              # Для работы Celery на Windows
 requests              # Для запросов к Telegram API
 flake8                # Для проверки кода
 coverage              # Для проверки покрытия тестами
+drf-yasg
+django-celery-beat
