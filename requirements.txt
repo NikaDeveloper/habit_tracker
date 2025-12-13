@@ -82,6 +82,8 @@ packaging==25.0
     # via
     #   drf-yasg
     #   kombu
+pillow==12.0.0
+    # via -r requirements.in
 prompt-toolkit==3.0.52
     # via click-repl
 psycopg2-binary==2.9.11
