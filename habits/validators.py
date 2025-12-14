@@ -22,7 +22,7 @@ class ExecutionTimeValidator:
     def __call__(self, value):
         exec_time = value.get(self.field)
         if exec_time and exec_time > 120:
-            raise ValidationError('Врем выполнения должно быть не больше 120 секунд')
+            raise ValidationError('Время выполнения должно быть не больше 120 секунд')
 
 
 class RelatedHabitIsPleasantValidator:
