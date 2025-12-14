@@ -7,7 +7,8 @@ from .permissions import IsOwner
 
 
 class HabitViewSet(viewsets.ModelViewSet):
-    """ CRUD для привычек. Показывает только личные привычки """
+    """CRUD для привычек. Показывает только личные привычки"""
+
     serializer_class = HabitSerializer
     pagination_class = CustomPaginator
     permission_classes = [IsAuthenticated, IsOwner]
@@ -20,7 +21,8 @@ class HabitViewSet(viewsets.ModelViewSet):
 
 
 class PublicHabitListAPIView(generics.ListAPIView):
-    """ Список публичных привычек. Доступен всем, но без редактирования """
+    """Список публичных привычек. Доступен всем, но без редактирования"""
+
     queryset = Habit.objects.filter(is_public=True)
     serializer_class = HabitSerializer
     pagination_class = CustomPaginator
