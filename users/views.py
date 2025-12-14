@@ -8,11 +8,10 @@ from .serializers import RegisterSerializer
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self,request):
+    def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(
-            {'id': user.id, 'email': user.email},
-            status=status.HTTP_201_CREATED
+            {"id": user.id, "email": user.email}, status=status.HTTP_201_CREATED
         )
