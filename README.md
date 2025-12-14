@@ -77,4 +77,23 @@ celery -A config worker -l info
 celery -A config beat -l info
 ```
 
+## Тестирование и Документация
+*Запуск тестов:* 
+```bash
+python manage.py test
+```
 
+*Покрытие тестами:* 
+```bash 
+coverage run --source='.' manage.py test && coverage report
+```
+
+*Документация (Swagger):* 
+```bash
+# Доступна после запуска сервера по адресу 
+http://127.0.0.1:8000/swagger/
+```
+*Linter: Проверка кода flake8*
+
+*Автор
+Nika Developer*
