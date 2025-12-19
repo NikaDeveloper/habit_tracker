@@ -13,7 +13,9 @@ asgiref==3.11.0
 billiard==4.2.4
     # via celery
 celery==5.6.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   django-celery-beat
 certifi==2025.11.12
     # via requests
 charset-normalizer==3.4.4
@@ -37,19 +39,29 @@ coverage==7.13.0
 django==6.0
     # via
     #   -r requirements.in
+    #   django-celery-beat
     #   django-cors-headers
+    #   django-timezone-field
     #   djangorestframework
     #   djangorestframework-simplejwt
+    #   drf-yasg
+django-celery-beat==2.1.0
+    # via -r requirements.in
 django-cors-headers==4.9.0
     # via -r requirements.in
+django-timezone-field==4.2.3
+    # via django-celery-beat
 djangorestframework==3.16.1
     # via
     #   -r requirements.in
     #   djangorestframework-simplejwt
+    #   drf-yasg
 djangorestframework-simplejwt==5.5.1
     # via -r requirements.in
 dnspython==2.8.0
     # via eventlet
+drf-yasg==1.21.11
+    # via -r requirements.in
 eventlet==0.40.4
     # via -r requirements.in
 exceptiongroup==1.3.1
@@ -60,12 +72,18 @@ greenlet==3.3.0
     # via eventlet
 idna==3.11
     # via requests
+inflection==0.5.1
+    # via drf-yasg
 kombu==5.6.1
     # via celery
 mccabe==0.7.0
     # via flake8
 packaging==25.0
-    # via kombu
+    # via
+    #   drf-yasg
+    #   kombu
+pillow==12.0.0
+    # via -r requirements.in
 prompt-toolkit==3.0.52
     # via click-repl
 psycopg2-binary==2.9.11
@@ -76,10 +94,18 @@ pyflakes==3.4.0
     # via flake8
 pyjwt==2.10.1
     # via djangorestframework-simplejwt
+python-crontab==3.3.0
+    # via django-celery-beat
 python-dateutil==2.9.0.post0
     # via celery
 python-dotenv==1.2.1
     # via -r requirements.in
+pytz==2025.2
+    # via
+    #   django-timezone-field
+    #   drf-yasg
+pyyaml==6.0.3
+    # via drf-yasg
 redis==7.1.0
     # via -r requirements.in
 requests==2.32.5
@@ -95,6 +121,8 @@ tzdata==2025.2
     #   tzlocal
 tzlocal==5.3.1
     # via celery
+uritemplate==4.2.0
+    # via drf-yasg
 urllib3==2.6.1
     # via requests
 vine==5.1.0
