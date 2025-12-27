@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. База данных
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis хранилище для задач Celery
+  redis:
+    image: redis:7-alpine
+
+  # 3. Само Django приложение
+  app:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+
+  # 4. Celery Worker (выполняет задачи)
+  celery_worker:
+    build: .
+    command: celery -A config worker -l info
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+
+  # 5. Celery Beat (отправляет задачи по расписанию)
+  celery_beat:
+    build: .
+    command: celery -A config beat -l info
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
