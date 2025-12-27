@@ -117,7 +117,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/habit_tracker
-          git pull origin main
+          
+          git fetch origin
+          git checkout feature/deploy
+          git pull origin feature/deploy
           
           # Формируем имя образа с тегом (хеш коммита)
           export DOCKER_IMAGE=${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:${{ github.sha }}
