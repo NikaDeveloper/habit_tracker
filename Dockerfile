@@ -1,7 +1,7 @@
 FROM python:3.13-slim
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Собираем статику проекта
-RUN python manage.py collectstatic --noinput
+# Собираем статику проекта (теперь с временным ключом)
+RUN SECRET_KEY=setup_only_key python manage.py collectstatic --noinput
 
 # Команда для запуска
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
