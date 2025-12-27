@@ -108,7 +108,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:6379/0"
