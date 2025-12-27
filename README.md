@@ -22,78 +22,35 @@
 
 ## Установка и запуск
 
-### 1. Клонирование репозитория
+### Docker и Деплой (CI/CD)
 
-```bash
-git clone https://github.com/NikaDeveloper/habit_tracker.git
-cd habit_tracker
-```
+Проект полностью контейнеризирован и настроен для автоматического развертывания.
 
-### 2. Настройка окружения
-*Создайте виртуальное окружение и установите зависимости:*
+### Docker Compose
+Приложение разворачивается в связке из 5 контейнеров:
+* **app**: Django + Gunicorn (Backend)
+* **db**: PostgreSQL (Database)
+* **redis**: Redis (Broker)
+* **nginx**: Reverse-proxy (раздача статики и маршрутизация)
+* **celery_worker / beat**: Фоновые задачи
 
+**Запуск через Docker:**
 ```bash
-python -m venv .venv
-```
-*Windows:*
-```bash
-.venv\Scripts\activate
-```
-*Linux/MacOS:*
-```bash
-source .venv/bin/activate
-```
-*Проект использует pip-tools для фиксации версий.*
-```bash
-pip install -r requirements.txt
+docker-compose up -d --build
 ```
 
-### 3. Переменные окружения (.env)
-Создайте файл .env в корне проекта и заполните его по образцу .env.example.
+## GitHub Actions (CI/CD)
+В проекте настроен автоматизированный Pipeline (.github/workflows/ci.yml):
 
-### 4. Миграции
-```bash
-python manage.py migrate
-```
+* **Lint:** Проверка кода на соответствие стандартам PEP8 (flake8).
 
-### 5. Запуск проекта
-*Для полноценной работы системы напоминаний необходимо запустить 3 процесса в разных терминалах:*
+* **Test:** Автоматический прогон тестов.
 
-*Терминал 1: Веб-сервер Django*
-```bash
-python manage.py runserver
-```
-*Терминал 2: Celery Worker (Обработка задач)*
-```bash
-# Windows (требуется eventlet):
-celery -A config worker -l info -P eventlet
-```
-```bash
-# Linux/MacOS:
-celery -A config worker -l info
-```
-*Терминал 3: Celery Beat (Планировщик)*
-```bash
-celery -A config beat -l info
-```
+* **Build:** Сборка Docker-образа и пуш в Docker Hub.
 
-## Тестирование и Документация
-*Запуск тестов:* 
-```bash
-python manage.py test
-```
+* **Deploy:** Автоматическое обновление приложения на удаленном сервере (GCP) через SSH.
 
-*Покрытие тестами:* 
-```bash 
-coverage run --source='.' manage.py test && coverage report
-```
 
-*Документация (Swagger):* 
-```bash
-# Доступна после запуска сервера по адресу 
-http://127.0.0.1:8000/swagger/
-```
-*Linter: Проверка кода flake8*
 
 *Автор
 Nika Developer*
