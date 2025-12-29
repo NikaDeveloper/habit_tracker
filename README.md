@@ -2,6 +2,12 @@
 
 Бэкенд-часть SPA веб-приложения для отслеживания полезных привычек, разработанная в рамках курсового проекта. Проект вдохновлен книгой Джеймса Клира «Атомные привычки».
 
+## Ссылки на проект
+* **Swagger UI:** [http://35.225.159.192/swagger/](http://35.225.159.192/swagger/)
+* **ReDoc:** [http://35.225.159.192/redoc/](http://35.225.159.192/redoc/)
+* **Admin Panel:** [http://35.225.159.192/admin/](http://35.225.159.192/admin/)
+*(Примечание: Корень сайта / возвращает 404, так как эндпоинты настроены для API и документации).*
+
 ## Основной функционал
 
 * **CRUD для привычек:** Создание, чтение, редактирование и удаление привычек.
@@ -13,87 +19,78 @@
 
 ## Стек технологий
 
-* **Python 3.14**
-* **Django 6.0**
-* **Django REST Framework (DRF)**
-* **PostgreSQL** (База данных)
-* **Celery** (Отложенные задачи и периодические напоминания)
-* **Redis** (Брокер сообщений)
+* **Python 3.13 / Django 6.0 / DRF**
+* **PostgreSQL** (БД) / **Redis** (Брокер)
+* **Celery / Celery Beat** (Задачи по расписанию)
+* **Nginx** (Reverse-proxy & Static delivery)
+* **Docker / Docker Compose** (Контейнеризация)
 
-## Установка и запуск
+### Docker и Деплой (CI/CD)
 
-### 1. Клонирование репозитория
+Проект полностью контейнеризирован и настроен для автоматического развертывания.
 
+### Docker Compose
+Приложение разворачивается в связке из 5 контейнеров:
+* **app**: Django + Gunicorn (Backend)
+* **db**: PostgreSQL (Database)
+* **redis**: Redis (Broker)
+* **nginx**: Reverse-proxy (раздача статики и маршрутизация)
+* **celery_worker / beat**: Фоновые задачи
+
+**Запуск через Docker:**
 ```bash
-git clone https://github.com/NikaDeveloper/habit_tracker.git
-cd habit_tracker
+docker-compose up -d --build
 ```
 
-### 2. Настройка окружения
-*Создайте виртуальное окружение и установите зависимости:*
+## GitHub Actions (CI/CD)
+В проекте настроен автоматизированный Pipeline (.github/workflows/ci.yml):
 
-```bash
-python -m venv .venv
-```
-*Windows:*
-```bash
-.venv\Scripts\activate
-```
-*Linux/MacOS:*
-```bash
-source .venv/bin/activate
-```
-*Проект использует pip-tools для фиксации версий.*
-```bash
-pip install -r requirements.txt
-```
+* **Lint:** Проверка кода на соответствие стандартам PEP8 (flake8).
 
-### 3. Переменные окружения (.env)
-Создайте файл .env в корне проекта и заполните его по образцу .env.example.
+* **Test:** Автоматический прогон тестов.
 
-### 4. Миграции
-```bash
-python manage.py migrate
-```
+* **Build:** Сборка Docker-образа и пуш в Docker Hub.
 
-### 5. Запуск проекта
-*Для полноценной работы системы напоминаний необходимо запустить 3 процесса в разных терминалах:*
+* **Deploy:** Автоматическое обновление приложения на удаленном сервере (GCP) через SSH.
 
-*Терминал 1: Веб-сервер Django*
-```bash
-python manage.py runserver
-```
-*Терминал 2: Celery Worker (Обработка задач)*
-```bash
-# Windows (требуется eventlet):
-celery -A config worker -l info -P eventlet
-```
-```bash
-# Linux/MacOS:
-celery -A config worker -l info
-```
-*Терминал 3: Celery Beat (Планировщик)*
-```bash
-celery -A config beat -l info
-```
 
-## Тестирование и Документация
-*Запуск тестов:* 
+## Настройка удаленного сервера и Deployment
+
+### 1. Подготовка сервера (Ubuntu 22.04+)
+Для развертывания использовалась виртуальная машина на GCP. Основные шаги настройки:
+1. Установлен Docker и Docker Compose (v2+).
+2. Настроены SSH-ключи для доступа GitHub Actions к серверу.
+3. В папке проекта на сервере создан файл `.env` с секретными данными (БД, токены, настройки Django).
+
+### 2. Настройка CI/CD (GitHub Actions)
+Для автоматического деплоя в GitHub Secrets были добавлены следующие переменные:
+* `SSH_KEY` — приватный SSH-ключ для доступа к серверу.
+* `SSH_USER` — имя пользователя на сервере.
+* `SERVER_IP` — внешний IP-адрес сервера (35.225.159.192).
+* `DOCKER_HUB_USERNAME` / `DOCKER_HUB_TOKEN` — данные для пуша образов.
+
+### 3. Запуск деплоя
+Workflow запускается автоматически при каждом `push` в ветку `feature/deploy` (или `main`).
+**Шаги процесса:**
+1. **Lint & Test**: Проверка кода и запуск тестов внутри CI.
+2. **Build**: Сборка Docker-образа с тегом коммита и его отправка в Docker Hub.
+3. **Deploy**: 
+   - Подключение к серверу по SSH.
+   - Выполнение `git pull` для обновления конфигураций (nginx, docker-compose).
+   - Обновление тега образа в `.env` файле на сервере.
+   - Команда `docker-compose up -d` для перезапуска контейнеров с новой версией образа.
+
+## Тестирование
+
+*Запуск тестов:*
 ```bash
 python manage.py test
 ```
 
-*Покрытие тестами:* 
-```bash 
+*Покрытие:*
+```bash
 coverage run --source='.' manage.py test && coverage report
 ```
-
-*Документация (Swagger):* 
-```bash
-# Доступна после запуска сервера по адресу 
-http://127.0.0.1:8000/swagger/
-```
-*Linter: Проверка кода flake8*
 
 *Автор
 Nika Developer*

@@ -13,3 +13,4 @@ coverage              # Для проверки покрытия тестами
 drf-yasg              # Для Swagger-документации
 django-celery-beat    # Для расписания Celery-задач
 pillow                # Для работы с изображениями
+gunicorn
