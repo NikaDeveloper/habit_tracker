@@ -133,7 +133,10 @@ jobs:
           sed -i '/DOCKER_IMAGE/d' .env
           echo "DOCKER_IMAGE=$DOCKER_IMAGE" >> .env
           
-          # Запускаем
+          # Сначала убиваем старое, чтобы не было конфликтов имен
+          docker-compose down
+          
+          # Запускаем новое
           docker-compose pull
           docker-compose up -d
           EOF
