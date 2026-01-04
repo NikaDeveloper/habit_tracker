@@ -118,19 +118,25 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/habit_tracker
           
-          git fetch origin
-          git checkout feature/deploy
-          git pull origin feature/deploy
+          # Очищаем место перед загрузкой нового (чтобы диск не забился)
+          docker system prune -a --volumes -f
           
-          # Формируем имя образа с тегом (хеш коммита)
+          git fetch origin
+          # ВАЖНО: Переключаемся на текущую ветку разработки
+          git checkout feature/deployment
+          git pull origin feature/deployment
+          
+          # Формируем имя образа с тегом
           export DOCKER_IMAGE=${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:${{ github.sha }}
           
-          # Записываем его в .env файл на сервере (чтобы docker-compose его видел)
-          # grep -v удаляет старую запись DOCKER_IMAGE, чтобы не дублировать
+          # Обновляем .env
           sed -i '/DOCKER_IMAGE/d' .env
           echo "DOCKER_IMAGE=$DOCKER_IMAGE" >> .env
           
-          # Обновляем контейнеры
+          # Сначала убиваем старое, чтобы не было конфликтов имен
+          docker-compose down
+          
+          # Запускаем новое
           docker-compose pull
           docker-compose up -d
           EOF
